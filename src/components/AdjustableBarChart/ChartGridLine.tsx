@@ -15,11 +15,12 @@ const ChartGridLineStyled = styled.div<ChartGridLineStyledProps>`
     ${({ height, y, showLeadingLine, showActiveLine }) => `
     height: ${height}px;
     bottom: ${y}px;
-    ${showLeadingLine ? `border-top: 1px dotted ${COLORS.GREY}`: ''};
-    ${showActiveLine ? `border-top: 1px dotted ${GRID_LINE_COLOR}`: ''};
+    ${showLeadingLine ? `border-top: 1px dotted ${COLORS.GREY}` : ''};
+    ${showActiveLine ? `border-top: 1px dotted ${GRID_LINE_COLOR}` : ''};
     `}
     width: 100%;
     position: absolute;
+    user-select: none;
 `;
 
 interface ChartGridLineAxisProps {
@@ -62,10 +63,9 @@ interface ChartGridLineProps {
 
 const ChartGridLine = ({ height, y, offsetLeft, showLeadingLine, showActiveLine, label }: ChartGridLineProps) => {
     return (
-        <ChartGridLineStyled 
+        <ChartGridLineStyled
             {...{ height, y, showLeadingLine, showActiveLine }}
-            onDragOver={e => e.preventDefault()}
-            >
+        >
             <ChartGridLineAxis offsetLeft={offsetLeft}>
                 {showLeadingLine ? <ChartGridLineAxisLabel offsetLeft={offsetLeft}>{label}</ChartGridLineAxisLabel> : null}
             </ChartGridLineAxis>

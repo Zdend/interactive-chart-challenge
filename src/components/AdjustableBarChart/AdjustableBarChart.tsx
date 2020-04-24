@@ -14,7 +14,7 @@ interface AdjustableBarChartProps {
     barCount?: number;
     initialValues?: number[];
     barColors?: string[] | string;
-    readOnly?: boolean; 
+    readOnly?: boolean;
     offsetLeft?: number;
     barGutter?: number;
     onChange?: (values: number[]) => void;
@@ -31,12 +31,13 @@ const AdjustableBarChart = ({
     barColors,
     onChange,
 }: AdjustableBarChartProps) => {
-    const [ barValues, setBarValues ] = useState(getInitialBarValues(barCount, initialValues, maxY));
-    const [ activeBar, setActiveBar ] = useState(null);
-    
+    const [barValues, setBarValues] = useState(getInitialBarValues(barCount, initialValues, maxY));
+    const [activeBar, setActiveBar] = useState(null);
+
     const gridYHeight = height / maxY;
     const barWidth = (100 / barValues.length) - barGutter;
-    
+    const isActive = activeBar !== null;
+
     const chartRef = useRef(null);
     const changeValue = useCallback((barIndex: number, value: number) => {
         const newValues = barValues.map((presentValue, index) => index === barIndex ? value : presentValue);
@@ -45,49 +46,66 @@ const AdjustableBarChart = ({
             onChange(newValues);
         }
     }, [barValues, onChange]);
-    
-    const onDrag = useCallback((clientY: number, barIndex: number) => {
-        if (clientY === 0) {
+
+    const onBarMove = useCallback((clientY: number) => {
+        if (clientY === 0 || !isActive) {
             return;
         }
 
         const chartBottom = chartRef.current.getBoundingClientRect().top + height;
         const barValue = Math.floor((chartBottom - clientY) / gridYHeight);
-        changeValue(barIndex, range(barValue, 0, maxY));
-    }, [changeValue, gridYHeight, height, maxY]);
+        changeValue(activeBar, range(barValue, 0, maxY));
+    }, [changeValue, gridYHeight, height, maxY, activeBar, isActive]);
 
     const onKeyPress = useCallback((e: React.KeyboardEvent, barIndex: number) => {
         let barValue = barValues[barIndex];
         if (e.keyCode === 38) {
             e.preventDefault();
             barValue++;
-        } else if(e.keyCode === 40) {
+        } else if (e.keyCode === 40) {
             e.preventDefault();
             barValue--;
         }
         changeValue(barIndex, range(barValue, 0, maxY));
-    }, [changeValue, maxY, barValues])
+    }, [changeValue, maxY, barValues]);
 
-    const onDragThrottled = useRef(onDrag);
+    const onBarMoveThrottled = useRef(onBarMove);
+
     useEffect(() => {
-        onDragThrottled.current = throttle(onDrag, 50);
-    }, [onDrag])
+        onBarMoveThrottled.current = throttle(onBarMove, 50);
+    }, [onBarMove]);
+
+    useEffect(() => {
+        const removeActiveBar = () => setActiveBar(null);
+        const moveBar = (e: MouseEvent) => {
+            onBarMoveThrottled.current(e.clientY);
+        }
+        document.addEventListener('mouseup', removeActiveBar);
+        document.addEventListener('mousemove', moveBar);
+        return () => {
+            document.removeEventListener('mouseup', removeActiveBar);
+            document.removeEventListener('mousemove', moveBar);
+        }
+    }, [setActiveBar]);
 
     const activeBarValue = activeBar !== null ? barValues[activeBar] - 1 : -1;
 
     return (
         <ChartWrapper offsetLeft={offsetLeft}>
-            <ChartGrid height={height} ref={chartRef}>
-                <ChartGridLines 
+            <ChartGrid
+                height={height}
+                isActive={activeBar !== null}
+                ref={chartRef}
+            >
+                <ChartGridLines
                     height={gridYHeight}
                     activeLevel={activeBarValue}
                     offsetLeft={offsetLeft}
                     maxY={maxY}
                 />
-                {barValues.map((barValue, index) => <ChartBar 
+                {barValues.map((barValue, index) => <ChartBar
                     key={index}
                     position={index}
-                    onDrag={onDragThrottled.current}
                     onKeyPress={onKeyPress}
                     setActiveBar={setActiveBar}
                     readOnly={readOnly}
@@ -107,8 +125,8 @@ AdjustableBarChart.defaultProps = {
     height: 300,
     maxY: 15,
     barCount: 4,
-    initialValues: [ 2, 5, 6, 9 ],
-    barColors: [ COLORS.PRIMARY, COLORS.INFO, COLORS.SUCCESS, COLORS.WARNING ],
+    initialValues: [2, 5, 6, 9],
+    barColors: [COLORS.PRIMARY, COLORS.INFO, COLORS.SUCCESS, COLORS.WARNING],
     readOnly: false,
     offsetLeft: BASE_UNIT * 4,
     barGutter: 5,

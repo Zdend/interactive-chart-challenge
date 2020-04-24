@@ -55,3 +55,8 @@
 - You may have questions as you interpret and implement the component, use your best judgment – we're interested in understanding your decisions.
 
 - When you have finished, zip up the solution/repository and send back to us. _Please do not publish your work to a public repository or hosting service._
+
+
+### Third party libraries
+- lodash.throttle - optimising performance by reducing callback execution
+- 

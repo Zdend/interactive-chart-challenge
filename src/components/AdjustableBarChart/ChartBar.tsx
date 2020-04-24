@@ -12,7 +12,6 @@ interface ChartBarStyledProps {
 }
 
 const ChartBarStyled = styled.div<ChartBarStyledProps>`
-    transition: height 30ms ease-in-out;
     ${({ width, value, x, color }) => `
         width: ${width}%;
         height: ${value}px;
@@ -62,7 +61,6 @@ interface ChartBarProps {
     color: string;
     isActive: boolean;
     readOnly: boolean;
-    onDrag: (clientY: number, position: number) => void;
     onKeyPress: (e: React.KeyboardEvent, position: number) => void;
     setActiveBar: (position: number) => void;
 }
@@ -72,8 +70,7 @@ const ChartBar = ({
     value, 
     gutter, 
     x, 
-    color, 
-    onDrag,
+    color,
     onKeyPress, 
     position,
     setActiveBar,
@@ -95,15 +92,8 @@ const ChartBar = ({
                 isActive={isActive}
                 tabIndex={0}
                 role="button"
-                draggable
-                onDragStart={() => {
+                onMouseDown={() => {
                     setActiveBar(position);
-                }}
-                onDrag={(e) => {
-                    onDrag(e.clientY, position);
-                }}
-                onDragEnd={() => {
-                    setActiveBar(null);
                 }}
                 onKeyDown={e => {
                     setActiveBar(position);

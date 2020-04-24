@@ -12,7 +12,7 @@ const PageContent = styled.main`
 
 interface BasicLayoutProps {
     title: string | JSX.Element;
-    children: JSX.Element | JSX.Element[];
+    children: React.ReactNode;
 }
 
 const BasicLayout = ({ title, children }: BasicLayoutProps) => {
