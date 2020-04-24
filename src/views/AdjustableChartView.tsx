@@ -7,6 +7,7 @@ const AdjustableChartView = () => {
     return (
         <BasicLayout title="Adjustable Bar Chart">
             <AdjustableBarChart />
+            <h2>Chart 2</h2>
         </BasicLayout>
     );
 };
