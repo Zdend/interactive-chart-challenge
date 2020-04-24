@@ -8,9 +8,11 @@ interface ChartBarStyledProps {
     gutter: number;
     x: number;
     color: string;
+    isActive: boolean;
 }
 
 const ChartBarStyled = styled.div<ChartBarStyledProps>`
+    transition: height 30ms ease-in-out;
     ${({ width, value, x, color }) => `
         width: ${width}%;
         height: ${value}px;
@@ -23,17 +25,32 @@ const ChartBarStyled = styled.div<ChartBarStyledProps>`
 
 interface ChartBarHandleProps {
     width: number;
+    isActive: boolean;
 }
 
 const ChartBarHandle = styled.div<ChartBarHandleProps>`
+    height: 2px;    
     position: absolute;
-    left: calc(50% - ${BASE_UNIT}px);
-    top: -${BASE_UNIT}px;
-    background: white;
-    height: ${BASE_UNIT * 2}px;
-    width: ${BASE_UNIT * 2}px;
-    border: 1px solid ${GRID_LINE_COLOR};
+    width: 100%;
     cursor: row-resize;
+    &:hover, &:focus {
+        background-color: black;
+        &::before {
+            border-width: 2px;
+        }
+    }
+
+    &::before {
+        content: " ";
+        display: block;
+        position: absolute;
+        left: calc(50% - ${BASE_UNIT}px);
+        top: -${BASE_UNIT}px;
+        background: white;
+        height: ${BASE_UNIT * 2}px;
+        width: ${BASE_UNIT * 2}px;
+        border: 1px solid ${GRID_LINE_COLOR};
+    }
 `;
 
 interface ChartBarProps {
@@ -43,34 +60,64 @@ interface ChartBarProps {
     x: number;
     position: number;
     color: string;
+    isActive: boolean;
     onDrag: (e: React.DragEvent, position: number) => void;
+    onKeyPress: (e: React.KeyboardEvent, position: number) => void;
+    setActiveBar: (position: number) => void;
 }
 
-const ChartBar = ({ width, value, gutter, x, color, onDrag, position }: ChartBarProps) => {
+const ChartBar = ({
+    width,
+    value, 
+    gutter, 
+    x, 
+    color, 
+    onDrag,
+    onKeyPress, 
+    position,
+    setActiveBar,
+    isActive
+}: ChartBarProps) => {
+
     return (
-        <ChartBarStyled 
-            width={width} 
-            value={value} 
-            gutter={gutter} 
+        <ChartBarStyled
+            width={width}
+            value={value}
+            gutter={gutter}
             x={x}
             color={color}
+            isActive={isActive}
         >
-            <ChartBarHandle 
+            <ChartBarHandle
                 width={width}
-                draggable 
-                onDragStart={e => e.dataTransfer.effectAllowed = 'move'}
-                onDrag={(e) => {
-                    onDrag(e, position);
+                isActive={isActive}
+                tabIndex={0}
+                draggable
+                onDragStart={e => {
+                    setActiveBar(position);
+                    e.dataTransfer.setData('text/plain', `${position}`);
+                    e.dataTransfer.effectAllowed = 'none';
                 }}
-                // onDrop={(e) => {
-                //     e.preventDefault();
-                //     e.dataTransfer.dropEffect = 'move';
+                // onDragEnter={e => {
+
+                //     e.dataTransfer.effectAllowed = DND_EFFECT;
+                //     e.dataTransfer.dropEffect = DND_EFFECT;
                 // }}
-                onDragOver={e => {
-                    e.dataTransfer.dropEffect = 'move';
-                    e.preventDefault();
+                onDrag={(e) => {
+                    e.persist();
+                    onDrag(e, position);
+                    // e.dataTransfer.effectAllowed = DND_EFFECT;
+                    // e.dataTransfer.dropEffect = DND_EFFECT;
                 }}
-                // onDragLeave={e => console.log(e.dataTransfer.getData('text/plain'))}
+                onDragEnd={e => {
+                    setActiveBar(null);
+                }}
+                onKeyDown={e => {
+                    setActiveBar(position);
+                    onKeyPress(e, position);
+                }}
+                onKeyUp={() => setActiveBar(null)}
+            // onDragLeave={e => console.log(e.dataTransfer.getData('text/plain'))}
             />
         </ChartBarStyled>
     );

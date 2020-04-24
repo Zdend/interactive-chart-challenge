@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { GRID_LINE_COLOR, REM, BASE_UNIT } from '../../shared/theme';
+import { GRID_LINE_COLOR, REM, BASE_UNIT, COLORS } from '../../shared/theme';
 
 const LABEL_FONT_SIZE = BASE_UNIT * 3;
 
@@ -8,13 +8,15 @@ interface ChartGridLineStyledProps {
     height: number;
     y: number;
     showLeadingLine: boolean;
+    showActiveLine: boolean;
 }
 
 const ChartGridLineStyled = styled.div<ChartGridLineStyledProps>`
-    ${({ height, y, showLeadingLine }) => `
+    ${({ height, y, showLeadingLine, showActiveLine }) => `
     height: ${height}px;
     bottom: ${y}px;
-    ${showLeadingLine ? `border-top: 1px dotted ${GRID_LINE_COLOR}`: ''};
+    ${showLeadingLine ? `border-top: 1px dotted ${COLORS.GREY}`: ''};
+    ${showActiveLine ? `border-top: 1px dotted ${GRID_LINE_COLOR}`: ''};
     `}
     width: 100%;
     position: absolute;
@@ -54,13 +56,27 @@ interface ChartGridLineProps {
     offsetLeft: number;
     y: number;
     showLeadingLine: boolean;
+    showActiveLine: boolean;
     label: JSX.Element | string;
 }
 
-const ChartGridLine = ({ height, y, offsetLeft, showLeadingLine, label }: ChartGridLineProps) => {
-
+const ChartGridLine = ({ height, y, offsetLeft, showLeadingLine, showActiveLine, label }: ChartGridLineProps) => {
     return (
-        <ChartGridLineStyled {...{ height, y, showLeadingLine }}>
+        <ChartGridLineStyled 
+            {...{ height, y, showLeadingLine, showActiveLine }}
+            onDragOver={e => {
+                e.preventDefault();
+                
+            }}
+            onDragEnter={e => {
+                const barIndex = e.dataTransfer.getData('text/plain');
+                console.log('enter', barIndex);
+            }}
+            onDrop={e => {
+                const barIndex = e.dataTransfer.getData('text/plain');
+                console.log('drop', barIndex);
+                e.dataTransfer.clearData();
+            }}>
             <ChartGridLineAxis offsetLeft={offsetLeft}>
                 {showLeadingLine ? <ChartGridLineAxisLabel offsetLeft={offsetLeft}>{label}</ChartGridLineAxisLabel> : null}
             </ChartGridLineAxis>

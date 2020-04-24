@@ -6,6 +6,7 @@ import ChartWrapper from './ChartWrapper';
 import ChartBar from './ChartBar';
 import { BASE_UNIT, COLORS } from '../../shared/theme';
 import throttle from 'lodash.throttle';
+import { range } from '../../shared/number';
 
 interface AdjustableBarChartProps {
     height?: number;
@@ -28,7 +29,8 @@ const AdjustableBarChart = ({
     barGutter,
     barColors,
 }: AdjustableBarChartProps) => {
-    const [ barValues, setBarValues ] = useState(getInitialBarValues(barCount, initialValues));
+    const [ barValues, setBarValues ] = useState(getInitialBarValues(barCount, initialValues, maxY));
+    const [ activeBar, setActiveBar ] = useState(null);
     const gridLines = new Array(maxY).fill(0).map((_, index) => index);
     const gridYHeight = height / maxY;
     const barWidth = (100 / barValues.length) - barGutter;
@@ -36,7 +38,7 @@ const AdjustableBarChart = ({
     const chartRef = useRef(null);
     const changeValue = useCallback((barIndex: number, value: number) => {
         setBarValues(barValues.map((presentValue, index) => index === barIndex ? value : presentValue));
-    }, [barValues, setBarValues]);
+    }, [barValues]);
     
     const onDrag = useCallback((e: React.DragEvent, barIndex: number) => {
         e.preventDefault();
@@ -46,22 +48,34 @@ const AdjustableBarChart = ({
 
         const chartBottom = chartRef.current.getBoundingClientRect().top + height;
         const barValue = Math.floor((chartBottom - e.clientY) / gridYHeight);
-        const adjustedBarValue = Math.min(Math.max(barValue, 0), maxY);
-        changeValue(barIndex, adjustedBarValue);
+        changeValue(barIndex, range(barValue, 0, maxY));
     }, [changeValue]);
+
+    const onKeyPress = useCallback((e: React.KeyboardEvent, barIndex: number) => {
+        let barValue = barValues[barIndex];
+        if (e.keyCode === 38) {
+            barValue++;
+        } else if(e.keyCode === 40) {
+            barValue--;
+        }
+        changeValue(barIndex, range(barValue, 0, maxY));
+    }, [changeValue])
 
     const onDragThrottled = useRef(onDrag);
     useEffect(() => {
-        onDragThrottled.current = throttle(onDrag, 200);
+        onDragThrottled.current = throttle(onDrag, 100);
     }, [onDrag])
+
+    const activeBarValue = activeBar ? barValues[activeBar] - 1 : -1;
 
     return (
         <ChartWrapper offsetLeft={offsetLeft}>
             <ChartGrid height={height} ref={chartRef}>
-                {gridLines.map((y) => <ChartGridLine 
+                {gridLines.map((y, index) => <ChartGridLine 
                     key={y} 
                     label={`${y + 1}`}
-                    showLeadingLine={(y + 1) % 5 === 0}
+                    showLeadingLine={(y + 1) % 5 === 0 || index + 1 === gridLines.length}
+                    showActiveLine={activeBarValue === y}
                     height={gridYHeight} 
                     y={y * gridYHeight} 
                     offsetLeft={offsetLeft}
@@ -70,7 +84,10 @@ const AdjustableBarChart = ({
                     key={index}
                     position={index}
                     onDrag={onDragThrottled.current}
-                    color={barColors[index]}
+                    onKeyPress={onKeyPress}
+                    setActiveBar={setActiveBar}
+                    isActive={activeBar === index}
+                    color={barColors[index] || COLORS.GREY}
                     value={barValue * gridYHeight}
                     width={barWidth}
                     x={barGutter + index * barWidth + index * barGutter}
