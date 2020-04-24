@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { BASE_UNIT, GRID_LINE_COLOR } from '../../shared/theme';
 
@@ -61,7 +61,8 @@ interface ChartBarProps {
     position: number;
     color: string;
     isActive: boolean;
-    onDrag: (e: React.DragEvent, position: number) => void;
+    readOnly: boolean;
+    onDrag: (clientY: number, position: number) => void;
     onKeyPress: (e: React.KeyboardEvent, position: number) => void;
     setActiveBar: (position: number) => void;
 }
@@ -76,7 +77,8 @@ const ChartBar = ({
     onKeyPress, 
     position,
     setActiveBar,
-    isActive
+    isActive,
+    readOnly
 }: ChartBarProps) => {
 
     return (
@@ -88,28 +90,19 @@ const ChartBar = ({
             color={color}
             isActive={isActive}
         >
-            <ChartBarHandle
+            {!readOnly && <ChartBarHandle
                 width={width}
                 isActive={isActive}
                 tabIndex={0}
+                role="button"
                 draggable
-                onDragStart={e => {
+                onDragStart={() => {
                     setActiveBar(position);
-                    e.dataTransfer.setData('text/plain', `${position}`);
-                    e.dataTransfer.effectAllowed = 'none';
                 }}
-                // onDragEnter={e => {
-
-                //     e.dataTransfer.effectAllowed = DND_EFFECT;
-                //     e.dataTransfer.dropEffect = DND_EFFECT;
-                // }}
                 onDrag={(e) => {
-                    e.persist();
-                    onDrag(e, position);
-                    // e.dataTransfer.effectAllowed = DND_EFFECT;
-                    // e.dataTransfer.dropEffect = DND_EFFECT;
+                    onDrag(e.clientY, position);
                 }}
-                onDragEnd={e => {
+                onDragEnd={() => {
                     setActiveBar(null);
                 }}
                 onKeyDown={e => {
@@ -117,10 +110,9 @@ const ChartBar = ({
                     onKeyPress(e, position);
                 }}
                 onKeyUp={() => setActiveBar(null)}
-            // onDragLeave={e => console.log(e.dataTransfer.getData('text/plain'))}
-            />
+            />}
         </ChartBarStyled>
     );
 };
 
-export default ChartBar;
+export default React.memo(ChartBar);

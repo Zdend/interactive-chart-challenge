@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { GRID_LINE_COLOR, REM, BASE_UNIT, COLORS } from '../../shared/theme';
+import { GRID_LINE_COLOR, BASE_UNIT, COLORS } from '../../shared/theme';
 
 const LABEL_FONT_SIZE = BASE_UNIT * 3;
 
@@ -64,19 +64,8 @@ const ChartGridLine = ({ height, y, offsetLeft, showLeadingLine, showActiveLine,
     return (
         <ChartGridLineStyled 
             {...{ height, y, showLeadingLine, showActiveLine }}
-            onDragOver={e => {
-                e.preventDefault();
-                
-            }}
-            onDragEnter={e => {
-                const barIndex = e.dataTransfer.getData('text/plain');
-                console.log('enter', barIndex);
-            }}
-            onDrop={e => {
-                const barIndex = e.dataTransfer.getData('text/plain');
-                console.log('drop', barIndex);
-                e.dataTransfer.clearData();
-            }}>
+            onDragOver={e => e.preventDefault()}
+            >
             <ChartGridLineAxis offsetLeft={offsetLeft}>
                 {showLeadingLine ? <ChartGridLineAxisLabel offsetLeft={offsetLeft}>{label}</ChartGridLineAxisLabel> : null}
             </ChartGridLineAxis>
@@ -85,4 +74,4 @@ const ChartGridLine = ({ height, y, offsetLeft, showLeadingLine, showActiveLine,
 };
 
 
-export default ChartGridLine;
+export default React.memo(ChartGridLine);
