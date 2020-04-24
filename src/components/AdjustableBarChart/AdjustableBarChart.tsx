@@ -70,7 +70,7 @@ const AdjustableBarChart = ({
 
     const onDragThrottled = useRef(onDrag);
     useEffect(() => {
-        onDragThrottled.current = throttle(onDrag, 200);
+        onDragThrottled.current = throttle(onDrag, 50);
     }, [onDrag])
 
     const activeBarValue = activeBar !== null ? barValues[activeBar] - 1 : -1;
