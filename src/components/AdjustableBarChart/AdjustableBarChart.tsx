@@ -88,13 +88,13 @@ const AdjustableBarChart = ({
         }
     }, [setActiveBar]);
 
-    const activeBarValue = activeBar !== null ? barValues[activeBar] - 1 : -1;
+    const activeBarValue = isActive ? barValues[activeBar] - 1 : -1;
 
     return (
         <ChartWrapper offsetLeft={offsetLeft}>
             <ChartGrid
                 height={height}
-                isActive={activeBar !== null}
+                isActive={isActive}
                 ref={chartRef}
             >
                 <ChartGridLines
