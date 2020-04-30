@@ -47,7 +47,7 @@ const AdjustableBarChart = ({
     }, [barValues, onChange]);
 
     const onBarMove = useCallback((clientY: number) => {
-        if (clientY === 0 || !isActive) {
+        if (clientY === 0 || !isActive || !chartRef.current) {
             return;
         }
 
