@@ -119,7 +119,6 @@ const AdjustableBarChart = ({
 AdjustableBarChart.defaultProps = {
     height: 300,
     maxY: 15,
-    value: [2, 5, 6, 9],
     barColors: [COLORS.PRIMARY, COLORS.INFO, COLORS.SUCCESS, COLORS.WARNING],
     readOnly: false,
     offsetLeft: BASE_UNIT * 4,
