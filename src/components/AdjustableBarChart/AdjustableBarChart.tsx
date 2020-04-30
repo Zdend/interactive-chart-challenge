@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { getInitialBarValues } from './utils';
+import { getBarValues } from './utils';
 import ChartGrid from './ChartGrid';
 import ChartGridLines from './ChartGridLines';
 import ChartWrapper from './ChartWrapper';
@@ -11,8 +11,7 @@ import { range } from '../../shared/number';
 interface AdjustableBarChartProps {
     height?: number;
     maxY?: number;
-    barCount?: number;
-    initialValues?: number[];
+    value: number[];
     barColors?: string[] | string;
     readOnly?: boolean;
     offsetLeft?: number;
@@ -23,15 +22,14 @@ interface AdjustableBarChartProps {
 const AdjustableBarChart = ({
     height,
     maxY,
-    barCount,
-    initialValues,
+    value,
     readOnly,
     offsetLeft,
     barGutter,
     barColors,
     onChange,
 }: AdjustableBarChartProps) => {
-    const [barValues, setBarValues] = useState(getInitialBarValues(barCount, initialValues, maxY));
+    const barValues = getBarValues(value, maxY);
     const [activeBar, setActiveBar] = useState(null);
 
     const gridYHeight = height / maxY;
@@ -41,9 +39,10 @@ const AdjustableBarChart = ({
     const chartRef = useRef(null);
     const changeValue = useCallback((barIndex: number, value: number) => {
         const newValues = barValues.map((presentValue, index) => index === barIndex ? value : presentValue);
-        setBarValues(newValues);
         if (typeof onChange === 'function') {
             onChange(newValues);
+        } else {
+            process.env.NODE_ENV !== 'production' && console.warn('You must provide onChange handler in edit mode.')
         }
     }, [barValues, onChange]);
 
@@ -69,16 +68,12 @@ const AdjustableBarChart = ({
         changeValue(barIndex, range(barValue, 0, maxY));
     }, [changeValue, maxY, barValues]);
 
-    const onBarMoveThrottled = useRef(onBarMove);
-
-    useEffect(() => {
-        onBarMoveThrottled.current = throttle(onBarMove, 50);
-    }, [onBarMove]);
+    const onBarMoveThrottled = useCallback(throttle(onBarMove, 50), [onBarMove]);
 
     useEffect(() => {
         const removeActiveBar = () => setActiveBar(null);
         const moveBar = (e: MouseEvent) => {
-            onBarMoveThrottled.current(e.clientY);
+            onBarMoveThrottled(e.clientY);
         }
         document.addEventListener('mouseup', removeActiveBar);
         document.addEventListener('mousemove', moveBar);
@@ -86,7 +81,7 @@ const AdjustableBarChart = ({
             document.removeEventListener('mouseup', removeActiveBar);
             document.removeEventListener('mousemove', moveBar);
         }
-    }, [setActiveBar]);
+    }, [setActiveBar, onBarMoveThrottled]);
 
     const activeBarValue = isActive ? barValues[activeBar] - 1 : -1;
 
@@ -124,8 +119,7 @@ const AdjustableBarChart = ({
 AdjustableBarChart.defaultProps = {
     height: 300,
     maxY: 15,
-    barCount: 4,
-    initialValues: [2, 5, 6, 9],
+    value: [2, 5, 6, 9],
     barColors: [COLORS.PRIMARY, COLORS.INFO, COLORS.SUCCESS, COLORS.WARNING],
     readOnly: false,
     offsetLeft: BASE_UNIT * 4,

@@ -16,6 +16,7 @@ const FancyInput = styled.input`
 const AdjustableChartView = () => {
     const [ chart1Y, setChart1Y ] = useState(15);
     const [ chart1Values, setChart1Values ] = useState([2, 4, 5, 12]);
+    const [ chart2Values, setChart2Values ] = useState([1, 8, 9]);
     return (
         <BasicLayout title="Adjustable Bar Chart">
             <label htmlFor="input-chart1y">Max Y Chart 1</label>
@@ -29,11 +30,11 @@ const AdjustableChartView = () => {
             />
             <div>Current values: { chart1Values.join(', ') }</div>
             <h2>Chart 1 - controlled Y axis</h2>
-            <AdjustableBarChart maxY={chart1Y} initialValues={chart1Values} onChange={setChart1Values} />
+            <AdjustableBarChart maxY={chart1Y} value={chart1Values} onChange={setChart1Values} />
             <h2>Chart 2 - custom colors, bar count</h2>
-            <AdjustableBarChart maxY={10} barCount={3} barColors="purple" />
+            <AdjustableBarChart maxY={10} value={chart2Values} onChange={setChart2Values} barColors="purple" />
             <h2>Chart 3 - readonly</h2>
-            <AdjustableBarChart readOnly barCount={6} initialValues={[5, 10, 25, 30, 54, 3]} maxY={60} />
+            <AdjustableBarChart  maxY={60} readOnly value={[5, 10, 25, 30, 54, 3]} />
         </BasicLayout>
     );
 };

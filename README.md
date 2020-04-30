@@ -1,6 +1,6 @@
-# Mathspace Frontend Test Task 2019
+# Frontend Test Task
 
-- Mathspace offers interactive content which allows students to demonstrate their understanding of mathematical concepts. For this task, we want you to create an interactive histogram component in React
+- X offers interactive content which allows students to demonstrate their understanding of mathematical concepts. For this task, we want you to create an interactive histogram component in React
 
 - ![Reference Screenshot](assets/histogram.png)
  
@@ -59,4 +59,3 @@
 
 ### Third party libraries
 - lodash.throttle - optimising performance by reducing callback execution
-- 
