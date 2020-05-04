@@ -9,25 +9,25 @@ import throttle from 'lodash.throttle';
 import { range } from '../../shared/number';
 
 interface AdjustableBarChartProps {
+    value: number[];
+    onChange?: (values: number[]) => void;
     height?: number;
     maxY?: number;
-    value: number[];
     barColors?: string[] | string;
     readOnly?: boolean;
     offsetLeft?: number;
     barGutter?: number;
-    onChange?: (values: number[]) => void;
 }
 
 const AdjustableBarChart = ({
-    height,
-    maxY,
-    value,
-    readOnly,
-    offsetLeft,
-    barGutter,
-    barColors,
     onChange,
+    value,
+    height = 300,
+    maxY = 15,
+    readOnly = false,
+    offsetLeft = BASE_UNIT * 4,
+    barGutter = 5,
+    barColors = [COLORS.PRIMARY, COLORS.INFO, COLORS.SUCCESS, COLORS.WARNING],
 }: AdjustableBarChartProps) => {
     const barValues = getBarValues(value, maxY);
     const [activeBar, setActiveBar] = useState(null);
@@ -52,7 +52,7 @@ const AdjustableBarChart = ({
         }
 
         const chartBottom = chartRef.current.getBoundingClientRect().top + height;
-        const barValue = Math.floor((chartBottom - clientY) / gridYHeight);
+        const barValue = Math.round((chartBottom - clientY) / gridYHeight);
         changeValue(activeBar, range(barValue, 0, maxY));
     }, [changeValue, gridYHeight, height, maxY, activeBar, isActive]);
 
@@ -114,15 +114,6 @@ const AdjustableBarChart = ({
             </ChartGrid>
         </ChartWrapper>
     );
-};
-
-AdjustableBarChart.defaultProps = {
-    height: 300,
-    maxY: 15,
-    barColors: [COLORS.PRIMARY, COLORS.INFO, COLORS.SUCCESS, COLORS.WARNING],
-    readOnly: false,
-    offsetLeft: BASE_UNIT * 4,
-    barGutter: 5,
 };
 
 export default AdjustableBarChart;
