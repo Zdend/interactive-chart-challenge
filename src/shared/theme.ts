@@ -6,6 +6,7 @@ export const COLORS = {
   INFO: '#2196F3',
   GREY: '#a5adb7',
   BLACK: '#000',
+  WHITE: '#fff',
 };
 
 export const GRID_LINE_COLOR = COLORS.BLACK;

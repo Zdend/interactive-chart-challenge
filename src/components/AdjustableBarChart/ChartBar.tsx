@@ -1,17 +1,16 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { BASE_UNIT, GRID_LINE_COLOR } from '../../shared/theme';
+import { BASE_UNIT, GRID_LINE_COLOR, COLORS } from '../../shared/theme';
+import { allowBasicProps } from '../../shared/styled';
 
 interface ChartBarStyledProps {
     value: number;
     width: number;
-    gutter: number;
     x: number;
     color: string;
-    isActive: boolean;
 }
 
-const ChartBarStyled = styled.div<ChartBarStyledProps>`
+const ChartBarStyled = styled('div', { shouldForwardProp: allowBasicProps })<ChartBarStyledProps>`
     ${({ width, value, x, color }) => `
         width: ${width}%;
         height: ${value}px;
@@ -23,22 +22,10 @@ const ChartBarStyled = styled.div<ChartBarStyledProps>`
 `;
 
 interface ChartBarHandleProps {
-    width: number;
     isActive: boolean;
 }
 
 const ChartBarHandle = styled.div<ChartBarHandleProps>`
-    height: 2px;    
-    position: absolute;
-    width: 100%;
-    cursor: row-resize;
-    &:hover, &:focus {
-        background-color: black;
-        &::before {
-            border-width: 2px;
-        }
-    }
-
     &::before {
         content: " ";
         display: block;
@@ -49,57 +36,77 @@ const ChartBarHandle = styled.div<ChartBarHandleProps>`
         height: ${BASE_UNIT * 2}px;
         width: ${BASE_UNIT * 2}px;
         border: 1px solid ${GRID_LINE_COLOR};
+        background-color: ${COLORS.WHITE};
+        z-index: 2;
+    }
+
+    height: 2px;    
+    position: absolute;
+    width: 100%;
+    cursor: row-resize;
+    &:hover, &:focus ${({ isActive }) => isActive ? ', &' : ''} {
+        background-color: black;
+        &::before {
+            border-width: 2px;
+        }
     }
 `;
 
 interface ChartBarProps {
     value: number;
+    height: number;
     width: number;
-    gutter: number;
     x: number;
+    maxY: number;
     position: number;
     color: string;
-    isActive: boolean;
     readOnly: boolean;
     onKeyPress: (e: React.KeyboardEvent, position: number) => void;
     setActiveBar: (position: number) => void;
+    isActive: boolean;
 }
 
 const ChartBar = ({
     width,
+    height,
     value, 
-    gutter, 
+    maxY,
     x, 
     color,
     onKeyPress, 
     position,
     setActiveBar,
+    readOnly,
     isActive,
-    readOnly
 }: ChartBarProps) => {
-
     return (
         <ChartBarStyled
             width={width}
-            value={value}
-            gutter={gutter}
+            value={height}
             x={x}
             color={color}
-            isActive={isActive}
+            role="slider"
+            aria-valuenow={value}
+            aria-valuemin={0}
+            aria-valuemax={maxY}
+            aria-valuetext={`${value} / ${maxY}`}
+            aria-label={`Bar ${position + 1}`}
+            aria-readonly={readOnly}
+            data-testid="abc__chart-bar"
         >
             {!readOnly && <ChartBarHandle
-                width={width}
-                isActive={isActive}
                 tabIndex={0}
+                isActive={isActive}
                 role="button"
-                onMouseDown={() => {
-                    setActiveBar(position);
-                }}
+                data-testid="abc__bar-handle"
+                onMouseDown={() => setActiveBar(position)}
+                onTouchStart={() => setActiveBar(position)}
                 onKeyDown={e => {
                     setActiveBar(position);
                     onKeyPress(e, position);
                 }}
                 onKeyUp={() => setActiveBar(null)}
+                onTouchEnd={() => setActiveBar(null)}
             />}
         </ChartBarStyled>
     );

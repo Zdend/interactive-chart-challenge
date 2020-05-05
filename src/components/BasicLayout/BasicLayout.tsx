@@ -11,7 +11,7 @@ const PageContent = styled.main`
 `;
 
 interface BasicLayoutProps {
-    title: string | JSX.Element;
+    title: string;
     children: React.ReactNode;
 }
 

@@ -1,8 +1,5 @@
 import { range } from '../../shared/number';
 
-export const getBarValues = (value: number[], maxY: number): number[] => {
-    return value.map((item, index) => {
-        const value = typeof item === 'number' ? item : index;
-        return range(value, 0, maxY);
-    });
+export const getBarValues = (values: number[], maxY: number): number[] => {
+    return values.map((item) => range(item, 0, maxY));
 }

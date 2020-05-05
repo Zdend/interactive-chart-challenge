@@ -33,7 +33,7 @@ const AdjustableBarChart = ({
     const [activeBar, setActiveBar] = useState(null);
 
     const gridYHeight = height / maxY;
-    const barWidth = (100 / barValues.length) - barGutter;
+    const barWidth = (100 - (barValues.length + 1) * barGutter) / barValues.length;
     const isActive = activeBar !== null;
 
     const chartRef = useRef(null);
@@ -41,8 +41,8 @@ const AdjustableBarChart = ({
         const newValues = barValues.map((presentValue, index) => index === barIndex ? value : presentValue);
         if (typeof onChange === 'function') {
             onChange(newValues);
-        } else {
-            process.env.NODE_ENV !== 'production' && console.warn('You must provide onChange handler in edit mode.')
+        } else if (process.env.NODE_ENV !== 'production') {
+            console.warn('You must provide onChange handler in edit mode.');
         }
     }, [barValues, onChange]);
 
@@ -72,16 +72,24 @@ const AdjustableBarChart = ({
 
     useEffect(() => {
         const removeActiveBar = () => setActiveBar(null);
-        const moveBar = (e: MouseEvent) => {
-            onBarMoveThrottled(e.clientY);
+        const moveBarMouse = (e: MouseEvent) => onBarMoveThrottled(e.clientY);
+        const moveBarTouch = (e: TouchEvent) => {
+            if (e.cancelable) {
+                e.preventDefault();
+                onBarMoveThrottled(e.touches[0]?.clientY);
+            }
         }
         document.addEventListener('mouseup', removeActiveBar);
-        document.addEventListener('mousemove', moveBar);
+        document.addEventListener('mousemove', moveBarMouse);
+        if (activeBar !== null) {
+            document.addEventListener('touchmove', moveBarTouch, { passive: false, });
+        }
         return () => {
             document.removeEventListener('mouseup', removeActiveBar);
-            document.removeEventListener('mousemove', moveBar);
+            document.removeEventListener('mousemove', moveBarMouse);
+            document.removeEventListener('touchmove', moveBarTouch);
         }
-    }, [setActiveBar, onBarMoveThrottled]);
+    }, [activeBar, setActiveBar, onBarMoveThrottled]);
 
     const activeBarValue = isActive ? barValues[activeBar] - 1 : -1;
 
@@ -104,12 +112,13 @@ const AdjustableBarChart = ({
                     onKeyPress={onKeyPress}
                     setActiveBar={setActiveBar}
                     readOnly={readOnly}
-                    isActive={activeBar === index}
                     color={Array.isArray(barColors) ? barColors[index] || COLORS.GREY : barColors}
-                    value={range(barValue, 0, maxY) * gridYHeight}
+                    value={range(barValue, 0, maxY)}
+                    height={range(barValue, 0, maxY) * gridYHeight}
+                    maxY={maxY}
                     width={barWidth}
                     x={barGutter + index * barWidth + index * barGutter}
-                    gutter={barGutter}
+                    isActive={activeBar === index}
                 />)}
             </ChartGrid>
         </ChartWrapper>

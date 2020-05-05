@@ -1,11 +1,11 @@
 import { css } from '@emotion/core';
-import { COLORS } from '../shared/theme';
+import { COLORS, BASE_UNIT } from '../shared/theme';
 
 export const globalStyles = css`
   *,
   *::before,
   *::after {
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 
   body {
@@ -21,4 +21,11 @@ export const globalStyles = css`
     `;
   })}
 
+  .mr-2 {
+    margin-right: ${BASE_UNIT * 2}px;
+  }
+
+  .ml-2 {
+    margin-left: ${BASE_UNIT * 2}px;
+  }
 `;

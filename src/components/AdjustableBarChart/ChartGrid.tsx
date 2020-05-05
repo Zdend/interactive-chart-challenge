@@ -1,18 +1,18 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { GRID_LINE_COLOR } from '../../shared/theme';
+import { allowBasicProps } from '../../shared/styled';
 
 interface ChartGrid {
     height: number;
     isActive: boolean;
 }
 
-const ChartGridStyled = styled.div<ChartGrid>`
+const ChartGridStyled = styled('div', { shouldForwardProp: allowBasicProps })<ChartGrid>`
     ${({ height, isActive }) => `
-        height: ${height}px;
-        ${isActive ? 'cursor: row-resize;' : ''}
+    height: ${height}px;
+    ${isActive ? 'cursor: row-resize;' : ''}
     `}
-    
     border-left: 1px solid ${GRID_LINE_COLOR};
     border-bottom: 1px solid ${GRID_LINE_COLOR};
     position: relative;

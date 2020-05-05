@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { GRID_LINE_COLOR, BASE_UNIT, COLORS } from '../../shared/theme';
+import { allowBasicProps } from '../../shared/styled';
 
 const LABEL_FONT_SIZE = BASE_UNIT * 3;
 
@@ -11,12 +12,13 @@ interface ChartGridLineStyledProps {
     showActiveLine: boolean;
 }
 
-const ChartGridLineStyled = styled.div<ChartGridLineStyledProps>`
+const ChartGridLineStyled = styled('div', { shouldForwardProp: allowBasicProps })<ChartGridLineStyledProps>`
     ${({ height, y, showLeadingLine, showActiveLine }) => `
     height: ${height}px;
     bottom: ${y}px;
-    ${showLeadingLine ? `border-top: 1px dotted ${COLORS.GREY}` : ''};
-    ${showActiveLine ? `border-top: 1px dotted ${GRID_LINE_COLOR}` : ''};
+    ${showLeadingLine ? `border-top: 1px dotted ${COLORS.GREY};` : ''};
+    ${showActiveLine ? `border-top: 1px dotted ${GRID_LINE_COLOR};` : ''};
+    ${showActiveLine ? `z-index: 1;` : ''};
     `}
     width: 100%;
     position: absolute;
@@ -55,19 +57,20 @@ const ChartGridLineAxisLabel = styled.div<ChartGridLineAxisLabelProps>`
 interface ChartGridLineProps {
     height: number;
     offsetLeft: number;
+    position: number;
     y: number;
     showLeadingLine: boolean;
     showActiveLine: boolean;
-    label: JSX.Element | string;
 }
 
-const ChartGridLine = ({ height, y, offsetLeft, showLeadingLine, showActiveLine, label }: ChartGridLineProps) => {
+const ChartGridLine = ({ height, y, position, offsetLeft, showLeadingLine, showActiveLine }: ChartGridLineProps) => {
     return (
         <ChartGridLineStyled
             {...{ height, y, showLeadingLine, showActiveLine }}
+            data-testid="abc__grid-line"
         >
             <ChartGridLineAxis offsetLeft={offsetLeft}>
-                {showLeadingLine ? <ChartGridLineAxisLabel offsetLeft={offsetLeft}>{label}</ChartGridLineAxisLabel> : null}
+                {showLeadingLine ? <ChartGridLineAxisLabel offsetLeft={offsetLeft}>{position + 1}</ChartGridLineAxisLabel> : null}
             </ChartGridLineAxis>
         </ChartGridLineStyled>
     );
