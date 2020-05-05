@@ -54,8 +54,20 @@
 
 - You may have questions as you interpret and implement the component, use your best judgment – we're interested in understanding your decisions.
 
-- When you have finished, zip up the solution/repository and send back to us. _Please do not publish your work to a public repository or hosting service._
+## Design choices
 
+The main component is called AdjustableBarChart. It is a controlled component that is demonstrated in custom showcase/storybook - views/AdjustableChartView. It supports mouse, keyboard and touch events. It implements basica accessibility standards for screen readers and for keyboard only users. The chart is implemented with a bunch of HTMLDivElements that are styled to resembled bar chart. The same could be achieved with SVG however due to simplicity of the chart which is consisted of rectangles only, divs were sufficient.
 
 ### Third party libraries
 - lodash.throttle - optimising performance by reducing callback execution
+- react-app-rewired and customize-cra - extending create-react-app without ejecting
+- @emotion - CSS in JS, styled components, scoped selectors
+- typescript - static types for better DX, maintainability and enforcing proper use of components and functions
+- @testing-library/react - library for simpler unit tests enforcing best practices out of the box
+
+### Nice to have
+- Better test coverage
+- End-to-end tests using Cypress
+- Pre-commit hooks for formatting
+- CI for linting, type checking, unit testing
+- Proper storybook showcase and documentation

@@ -3,7 +3,7 @@ import { COLORS } from '../../shared/theme';
 import styled from '@emotion/styled';
 
 const PageHeader = styled.h1`
-    border-bottom: 1px solid ${COLORS.GREY[1]};
+    border-bottom: 1px solid ${COLORS.GREY};
 `;
 
 const PageContent = styled.main`
