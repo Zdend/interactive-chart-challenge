@@ -1,6 +1,6 @@
 # Frontend Test Task
 
-- X offers interactive content which allows students to demonstrate their understanding of mathematical concepts. For this task, we want you to create an interactive histogram component in React
+- For this task, we want you to create an interactive histogram component in React
 
 - ![Reference Screenshot](assets/histogram.png)
  
